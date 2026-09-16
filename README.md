@@ -71,7 +71,6 @@ esp32_ble_activation/
 │   ├── ble_uart.c/.h       Nordic UART GATT service
 │   ├── console.c/.h        USB-serial → BLE forwarder
 │   └── ble_config.h        Device name and packet-size limits
-└── WorkFlow.md             Step-by-step runtime walkthrough
 ```
 
 ## Configuration notes
@@ -90,6 +89,10 @@ If your board is not 4 MB flash, change `CONFIG_ESPTOOLPY_FLASHSIZE` before buil
 
 ## Runtime flow
 
-Power-on → NVS → NimBLE → advertise `ESP32_BLE` → phone connects → MTU exchange → subscribe to TX → two-way text.
-
-A longer, event-by-event explanation is in [WorkFlow.md](WorkFlow.md).
+1. Power-on: `app_main()` initializes NVS, starts NimBLE, and launches the USB-serial console task.
+2. Radio ready: the board advertises as `ESP32_BLE`.
+3. Phone connects: the link handle is saved and an MTU exchange is requested (preferred 247 bytes).
+4. Phone enables TX notifications: the board can send text to the phone.
+5. Phone writes RX: text is printed on the USB serial monitor.
+6. You type in the serial monitor and press Enter: the line is sent to the phone as a TX notification.
+7. Disconnect: connection state is cleared and advertising starts again.
