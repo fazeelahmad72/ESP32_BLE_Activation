@@ -1,0 +1,58 @@
+# ---- Target chip ----
+# Build for classic ESP32 (not C3/S3)
+CONFIG_IDF_TARGET="esp32"
+
+# ---- Bluetooth stack ----
+# Turn Bluetooth on in ESP-IDF
+CONFIG_BT_ENABLED=y
+# Use NimBLE host (not Bluedroid)
+CONFIG_BT_NIMBLE_ENABLED=y
+# Explicitly keep Bluedroid off
+# CONFIG_BT_BLUEDROID_ENABLED is not set
+
+# ---- Bonding / security manager ----
+# Store bonds (LTK/IRK) in NVS across reboot
+CONFIG_BT_NIMBLE_NVS_PERSIST=y
+# Allow legacy pairing (phone compatibility)
+CONFIG_BT_NIMBLE_SM_LEGACY=y
+# Prefer LE Secure Connections when possible
+CONFIG_BT_NIMBLE_SM_SC=y
+# Ask for authenticated pairing when IO allows
+# NOTE: integer values cannot have end-of-line comments in sdkconfig.defaults
+CONFIG_BT_NIMBLE_SM_LVL=1
+# Keep up to 3 bonded phones
+CONFIG_BT_NIMBLE_MAX_BONDS=3
+
+# ---- Roles ----
+# Central is required only because ble_gattc_exchange_mtu() needs GATT Client,
+# and GATT Client depends on ROLE_CENTRAL in ESP-IDF NimBLE Kconfig.
+CONFIG_BT_NIMBLE_ROLE_CENTRAL=y
+# Act as connectable peripheral
+CONFIG_BT_NIMBLE_ROLE_PERIPHERAL=y
+# Allow advertising
+CONFIG_BT_NIMBLE_ROLE_BROADCASTER=y
+# Do not act as observer
+# CONFIG_BT_NIMBLE_ROLE_OBSERVER is not set
+# Needed for ble_gattc_exchange_mtu() in ble_app.c
+CONFIG_BT_NIMBLE_GATT_CLIENT=y
+# We are a GATT server (NUS)
+CONFIG_BT_NIMBLE_GATT_SERVER=y
+
+# ---- Flash size (TWO_OTA needs ~3.1MB; 2MB is too small) ----
+# Most ESP32 DevKits have 4MB flash
+CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y
+# Must match real chip flash size
+CONFIG_ESPTOOLPY_FLASHSIZE="4MB"
+
+# ---- OTA flash layout (needed before any OTA code works) ----
+# Use ota_0 + ota_1 + otadata partitions
+CONFIG_PARTITION_TABLE_TWO_OTA=y
+# CONFIG_PARTITION_TABLE_SINGLE_APP is not set
+
+# ---- Field-friendly defaults ----
+# Keep INFO logs (lower later for prod)
+CONFIG_LOG_DEFAULT_LEVEL_INFO=y
+# Panic if a watched task starves
+CONFIG_ESP_TASK_WDT_PANIC=y
+# Prefer smaller binary than debug speed
+CONFIG_COMPILER_OPTIMIZATION_SIZE=y
